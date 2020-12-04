@@ -14,12 +14,14 @@ let new_search_select = new SearchSelect(
 
             // путь к обработчику поиска
             handler: "search-select.php",
-            // показывать ли все значения списка при нажатии на пробел/при клике
+            // показывать ли все значения списка при клике
             isShowAll: true,
             // вызывать ли обработчик перед присвоением скрытому полю выбранного пользователем значения
             isEBeforeChange: true,
             // сам обработчик, принимает 2 аргумента - выбранный пользователем элемент (текст и значение)
-            eBeforeChange: function (txt, val) {};
+            eBeforeChange: function (txt, val) {},
+            // данное сообщение будет выведено, если запрос к handler не удастся
+            ajaxErrorMsg: "",
 
             // placeholder поля с поиском
             placeholder: "",
@@ -32,10 +34,14 @@ let new_search_select = new SearchSelect(
             defaultList: [
                 { txt: "Все товары", 	val: "-1" },
                 { txt: "Все заказчики", val: "-2" }
+            ],
+            notFoundList: [
+                { txt: "Ничего не найдено"   },
+                { txt: "Попробуйте ещё раз!" }
             ]
         }
          */
     }
 );
 
-console.log(new_search_select.classes);
+console.log(new_search_select.notFoundList);
