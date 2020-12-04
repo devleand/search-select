@@ -15,6 +15,9 @@ SearchSelect = function (data) {
 	this.setters.handler(props.handler, true);
 	this.setters.isShowAll(props.isShowAll, true);
 	this.setters.isEBeforeChange(props.isEBeforeChange, true);
+	if (this.isEBeforeChange) {
+		this.setters.eBeforeChange(props.eBeforeChange);
+	}
 	this.setters.searchMinLen(props.searchMinLen, true);
 	this.setters.classes(props.classes);
 	this.setters.placeholder(props.placeholder);
@@ -147,6 +150,12 @@ SearchSelect.prototype = {
 			} else if (isAuto && DOM.hasAttr(_this.getters.el(), _this.attrs.isEBeforeChange)) {
 				_this.isEBeforeChange = Types.toBool(DOM.getAttr(_this.getters.el(), _this.attrs.isEBeforeChange));
 			}
+		},
+		eBeforeChange: function (handler) {
+			if (!Types.isFunction(handler)) {
+				throw "You forgot to pass a handler for eBeforeChange!";
+			}
+			this.parent.eBeforeChange = handler;
 		},
 		searchMinLen: function (searchMinLen, isAuto = false) {
 			// isAuto	- если true, то, если значение searchMinLen некорректно, попытается найти в атрибуте

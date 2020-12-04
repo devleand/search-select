@@ -17,7 +17,9 @@ let new_search_select = new SearchSelect(
             // показывать ли все значения списка при нажатии на пробел/при клике
             isShowAll: true,
             // вызывать ли обработчик перед присвоением скрытому полю выбранного пользователем значения
-            isEBeforeChange: false,
+            isEBeforeChange: true,
+            // сам обработчик, принимает 2 аргумента - выбранный пользователем элемент (текст и значение)
+            eBeforeChange: function (txt, val) {};
 
             // placeholder поля с поиском
             placeholder: "",
