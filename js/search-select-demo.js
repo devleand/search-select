@@ -1,6 +1,9 @@
 let new_search_select = new SearchSelect(
     {
         el: '#search-select-demo',
+        data: {
+            searchMinLen: 2
+        }
         /*
         data: {
             classes: {
@@ -9,7 +12,10 @@ let new_search_select = new SearchSelect(
                 search: 'search-pole not-selected',
                 // классы невидимого поля со значением списка
                 res: 'result-selected',
-                resList: 'result-list'
+                resList: 'result-list',
+                notFound: 'nor-result',
+                resSelected: 'selected',
+                resNotSelected: 'not-selected'
             },
 
             // путь к обработчику поиска
@@ -29,9 +35,8 @@ let new_search_select = new SearchSelect(
             searchMinLen: 1,
             searchVal: "",
 
-            // атрибут value невидимого поля со значением списка
-            resVal: '-1',
-            defaultList: [
+            selected: { txt: "Все товары", 	val: "-1" },
+            constList: [
                 { txt: "Все товары", 	val: "-1" },
                 { txt: "Все заказчики", val: "-2" }
             ],
@@ -44,4 +49,4 @@ let new_search_select = new SearchSelect(
     }
 );
 
-console.log(new_search_select.notFoundList);
+//console.log(new_search_select);
