@@ -1,1 +1,1 @@
-Поле для поиска значений из БД и выбора их из списка
+Field for searching data on the server (for example, in the database) by the user
