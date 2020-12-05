@@ -89,7 +89,7 @@ SearchSelect.prototype = {
 	els: function () {
 		this.token 		= 'input[name^=_token]';
 		this.search		= 'input[name=search_val]';
-		this.res		= 'input[name=search_select_result]';
+		this.res		= 'input[type=hidden][name^=search]';
 		this.resList	= 'ul[name=result_list]';
 		this.list		= 'li';
 	},
@@ -446,9 +446,19 @@ SearchSelect.prototype = {
 				throw "Result selected is not type of Object!";
 			}
 			let _this = this.parent;
-			_this.setters.res(data.val);
+			
+			let val;
+			let txt;
+			if (data instanceof ResItem) {
+				val = data.getters.val();
+				txt = data.getters.txt();
+			} else {
+				val = data.val;
+				txt = data.txt;
+			}
+			_this.setters.res(val);
+			_this.setters.search(txt);
 			DOM.setAttr(_this.getters.searchEl(), 'class',_this.classes.search + ' ' + _this.classes.resSelected);
-			_this.setters.search(data.txt);
 		};
 		this.reset 	= function () {
 			let _this = this.parent;

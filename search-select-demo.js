@@ -2,7 +2,8 @@ let new_search_select = new SearchSelect(
     {
         el: '#search-select-demo',
         data: {
-            searchMinLen: 2
+            searchMinLen: 2,
+			selected: { txt: "Все товары", 	val: "-1" }
         }
         /*
         data: {
