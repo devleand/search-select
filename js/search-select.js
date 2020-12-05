@@ -372,6 +372,10 @@ SearchSelect.prototype = {
 				SearchSelect: _this,
 				handleEvent: __this.htmlKeyUp
 			}));
+			DOM.addEventListener(_this.getters.resListEl(), "click", new SearchSelectEvent({
+				SearchSelect: _this,
+				handleEvent: __this.resListClick
+			}));
 		};
 
 		this.searchClick 	= function (e) {
@@ -400,6 +404,7 @@ SearchSelect.prototype = {
 		this.searchInput 	= function (e) {
 			let _this = this.SearchSelect;
 
+			_this.res.reset();
 			if (_this.getters.searchVal().length >= _this.searchMinLen) {
 				let __this = this;
 				try {
@@ -425,6 +430,12 @@ SearchSelect.prototype = {
 		this.htmlMouseUp 	= function (e) {
 			this.SearchSelect.resList.hide();
 		};
+		this.resListClick	= function (e) {
+			let cur_li = new ResItem({
+				el: e.target
+			}, true);
+			this.SearchSelect.res.set(cur_li);
+		}
 	},
 
 	res: function (_this) {
