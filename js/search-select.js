@@ -55,11 +55,7 @@ SearchSelect = function (data) {
 	this.setters.searchMinLen(props.searchMinLen, true);
 	this.setters.classes(props.classes);
 	this.setters.placeholder(props.placeholder);
-	if (Types.isObject(props.selected)) {
-		this.res.set(props.selected);
-	} else {
-		this.res.reset();
-	}
+	this.setters.selected(props.selected);
 	this.setters.constList(props.constList);
 	this.setters.notFoundList(props.notFoundList);
 
@@ -99,6 +95,9 @@ SearchSelect.prototype = {
 		this.isShowAll			= "data-is-show-all";
 		this.isEBeforeChange	= "data-is-e-before-change";
 		this.searchMinLen		= "data-search-min-len";
+		this.selected			= "data-selected";
+		this.constList			= "data-const-list";
+		this.notFoundList		= "data-not-found-list";
 	},
 
 	// показывать ли все значения списка при нажатии на пробел/при клике
@@ -219,8 +218,44 @@ SearchSelect.prototype = {
 			let _this = this.parent;
 			DOM.setVal(_this.getters.resEl(), res);
 		};
+		this.selected		 = function (selected) {
+			let _this = this.parent;
+			
+			let el 				= _this.getters.el();
+			let selected_attr 	= _this.attrs.selected;
+			if (DOM.hasAttr(el, selected_attr)) {
+				let selected_attr_val = DOM.getAttr(el, selected_attr);
+				if (Types.isString(selected_attr_val)) {
+					try {
+						selected = JSON.parse(selected_attr_val);
+					} catch (e) {
+						throw "SearchSelect: selected value is not type of JSON!";
+					}
+				}
+			}
+			
+			if (Types.isObject(selected)) {
+				_this.res.set(selected);
+			} else {
+				_this.res.reset();
+			}
+		};
 		this.constList		 = function (constList) {
 			let _this = this.parent;
+			
+			let el 				= _this.getters.el();
+			let const_list_attr = _this.attrs.constList;
+			if (DOM.hasAttr(el, const_list_attr)) {
+				let const_list_attr_val = DOM.getAttr(el, const_list_attr);
+				if (Types.isString(const_list_attr_val)) {
+					try {
+						constList = JSON.parse(const_list_attr_val);
+					} catch (e) {
+						throw "SearchSelect: constList value is not type of JSON!";
+					}
+				}
+			}
+			
 			if (Types.isObject(constList) || Types.isArray(constList)) {
 				_this.constList = constList;
 			}
@@ -233,16 +268,30 @@ SearchSelect.prototype = {
 		};
 		this.notFoundList 	 = function (notFoundList) {
 			let _this = this.parent;
+			
+			let el 					= _this.getters.el();
+			let not_found_list_attr = _this.attrs.notFoundList;
+			if (DOM.hasAttr(el, not_found_list_attr)) {
+				let not_found_list_attr_val = DOM.getAttr(el, not_found_list_attr);
+				if (Types.isString(not_found_list_attr_val)) {
+					try {
+						notFoundList = JSON.parse(not_found_list_attr_val);
+					} catch (e) {
+						throw "SearchSelect: notFoundList value is not type of JSON!";
+					}
+				}
+			}
+			
 			if (Types.isObject(notFoundList) || Types.isArray(notFoundList)) {
 				_this.notFoundList = notFoundList;
 			}
 
 			let not_found_list = _this.notFoundList;
 			for (let i = 0; i < not_found_list.length; i++) {
-				if (!!not_found_list[i].class) {
-					continue;
+				if (!not_found_list[i].class) {
+					not_found_list[i].class = _this.classes.notFound;
 				}
-				not_found_list[i].class = _this.classes.notFound;
+				not_found_list[i].isResult = false;
 			}
 		}
 	},
@@ -434,7 +483,12 @@ SearchSelect.prototype = {
 			let cur_li = new ResItem({
 				el: e.target
 			}, true);
-			this.SearchSelect.res.set(cur_li);
+			let _this = this.SearchSelect;
+			if (cur_li.getters.isResult()) {
+				_this.res.set(cur_li);
+			} else {
+				_this.resList.show();
+			}
 		}
 	},
 
@@ -530,12 +584,13 @@ ResItem = function (props, isGet = false) {
 
 	if (isGet) {
 		let li_el = props.el;
-
-		this.class 	= DOM.getAttr(li_el, this.attrs.class, false);
-		this.val 	= DOM.getAttr(li_el, this.attrs.val, false);
-		this.type 	= DOM.getAttr(li_el, this.attrs.type, false);
-		this.txt 	= DOM.getTxt(li_el, false);
-
+		
+		this.setters.virtual.class(DOM.getAttr(li_el, this.attrs.class, false));
+		this.setters.virtual.val(DOM.getAttr(li_el, this.attrs.val, false));
+		this.setters.virtual.type(DOM.getAttr(li_el, this.attrs.type, false));
+		this.setters.virtual.isResult(DOM.getAttr(li_el, this.attrs.isResult, false));
+		this.setters.virtual.txt(DOM.getTxt(li_el, false));
+		
 		this.set(li_el);
 	} else {
 		if (!!props.class) {
@@ -546,6 +601,9 @@ ResItem = function (props, isGet = false) {
 		}
 		if (!!props.type) {
 			this.setters.virtual.type(props.type);
+		}
+		if (Types.isBool(props.isResult)) {
+			this.setters.virtual.isResult(props.isResult);
 		}
 		if (!!props.txt) {
 			this.setters.virtual.txt(props.txt);
@@ -561,12 +619,14 @@ ResItem.prototype = {
 	class: "",
 	val: "",
 	type: ResItemTypes.dyn,
+	isResult: true,
 	txt: "",
 
 	attrs: function () {
-		this.class 	= "class";
-		this.val 	= "data-val";
-		this.type	= "data-type";
+		this.class 		= "class";
+		this.val 		= "data-val";
+		this.type		= "data-type";
+		this.isResult	= "data-is-result";
 	},
 
 	set: function (docObj) {
@@ -583,6 +643,7 @@ ResItem.prototype = {
 		this.setters.document.class(this.getters.class());
 		this.setters.document.val(this.getters.val());
 		this.setters.document.type(this.getters.type());
+		this.setters.document.isResult(this.getters.isResult());
 		this.setters.document.txt(this.getters.txt());
 	},
 	remove: function () {
@@ -597,16 +658,26 @@ ResItem.prototype = {
 		this.virtual 	= function (__this) {
 			this.parent = __this;
 
-			this.class 	= function (_class) {
+			this.class 		= function (_class) {
 				this.parent.parent.class = _class;
 			};
-			this.val 	= function (val) {
+			this.val 		= function (val) {
 				this.parent.parent.val = val;
 			};
-			this.type 	= function (type) {
+			this.type 		= function (type) {
 				this.parent.parent.type = type;
 			};
-			this.txt 	= function (txt) {
+			this.isResult 	= function (isResult) {
+				let _this = this.parent.parent;
+				if (Types.isBool(isResult)) {
+					_this.isResult = isResult;
+				} else if (Types.isString(isResult)) {
+					_this.isResult = Types.toNumber(isResult) > 0 ? true : false;
+				} else {
+					throw "ResItem: isResult is undefined type!";
+				}
+			};
+			this.txt 		= function (txt) {
 				this.parent.parent.txt = txt;
 			};
 		};
@@ -614,19 +685,28 @@ ResItem.prototype = {
 		this.document 	= function (__this) {
 			this.parent = __this;
 
-			this.class 	= function (_class) {
+			this.class 		= function (_class) {
 				let _this = this.parent.parent;
 				DOM.setAttr(_this.get(), _this.attrs.class, _class, false);
 			};
-			this.val 	= function (val) {
+			this.val 		= function (val) {
 				let _this = this.parent.parent;
 				DOM.setAttr(_this.get(), _this.attrs.val, val, false);
 			};
-			this.type 	= function (type) {
+			this.type 		= function (type) {
 				let _this = this.parent.parent;
 				DOM.setAttr(_this.get(), _this.attrs.type, type, false);
 			};
-			this.txt 	= function (txt) {
+			this.isResult 	= function (isResult) {
+				if (isResult) {
+					isResult = "1";
+				} else {
+					isResult = "0";
+				}
+				let _this = this.parent.parent;
+				DOM.setAttr(_this.get(), _this.attrs.isResult, isResult, false);
+			};
+			this.txt 		= function (txt) {
 				let _this = this.parent.parent;
 				DOM.setTxt(_this.get(), txt, false);
 			};
@@ -652,6 +732,12 @@ ResItem.prototype = {
 				this.document.type(type);
 			}
 		};
+		this.isResult 	= function (isResult) {
+			this.virtual.isResult(isResult);
+			if (!Types.isNull(this.parent.get())) {
+				this.document.isResult(isResult);
+			}
+		};
 		this.txt 		= function (txt) {
 			this.virtual.txt(txt);
 			if (!Types.isNull(this.parent.get())) {
@@ -662,19 +748,22 @@ ResItem.prototype = {
 	getters: function (_this) {
 		this.parent = _this;
 
-		this.tag 	= function () {
+		this.tag 		= function () {
 			return this.parent.tag;
 		}
-		this.class 	= function () {
+		this.class 		= function () {
 			return this.parent.class;
 		};
-		this.val 	= function () {
+		this.val 		= function () {
 			return this.parent.val;
 		};
-		this.type 	= function () {
+		this.type 		= function () {
 			return this.parent.type;
 		};
-		this.txt 	= function () {
+		this.isResult 	= function () {
+			return this.parent.isResult;
+		};
+		this.txt 		= function () {
 			return this.parent.txt;
 		};
 	}

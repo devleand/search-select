@@ -1,10 +1,6 @@
 let new_search_select = new SearchSelect(
     {
         el: '#search-select-demo',
-        data: {
-            searchMinLen: 2,
-			selected: { txt: "Все товары", 	val: "-1" }
-        }
         /*
         data: {
             classes: {
@@ -14,7 +10,7 @@ let new_search_select = new SearchSelect(
                 // классы невидимого поля со значением списка
                 res: 'result-selected',
                 resList: 'result-list',
-                notFound: 'nor-result',
+                notFound: 'not-result',
                 resSelected: 'selected',
                 resNotSelected: 'not-selected'
             },

@@ -20,9 +20,23 @@
     data-search-min-len     [int]               1                       минимальная длинна слова, с которой начинается поиск
     data-is-show-all        [bool]              true                    показывать ли все значения списка при нажатии на пробел/при клике
     data-is-e-before-change [bool]              false                   вызывать ли обработчик перед присвоением скрытому полю выбранного пользователем значения
+    data-selected 			[json]            	-                   	Выбранные текст и значение (например: "{ "txt": "Все товары", "val": "-1" }")
+	data-const-list 		[json]            	-                   	Массив объектов, которые будут отображаться всегда вверху списка (например: "[
+																			{ "txt": "Все товары", 	"val": "-1" },
+																			{ "txt": "Все заказчики", "val": "-2" }
+																		]")
+    data-not-found-list 	[json]            	-                   	Массив объектов, которые будут отображаться при отсутствии результатов поиска (например: "[
+																			{ "txt": "Ничего не найдено"   },
+																			{ "txt": "Попробуйте ещё раз!" }
+																		]")
 -->
 
-<div id = "search-select-demo" data-handler = "search-select-demo.php">
+<div id = "search-select-demo" 
+	data-handler = "search-select-demo.php" 
+	data-search-min-len = "2" 
+	data-selected = '{ "txt": "Все товары", "val": "-1" }' 
+	data-const-list = '[{ "txt": "Все товары", 	"val": "-1" },{ "txt": "Все заказчики", "val": "-2" }]'
+	data-not-found-list = '[{ "txt": "Ничего не найдено" },{ "txt": "Попробуйте ещё раз!" }]' >
     <input type = "hidden" value = "83kdsmkwej3" name = "_token">
     <input type = "search" name="search_val" value = "">
     <input type = "hidden" value = "" name = "search_select_result">
