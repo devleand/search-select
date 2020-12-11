@@ -84,7 +84,7 @@ SearchSelect.prototype = {
 	// селекторы элементов (относительно основного блока)
 	els: function () {
 		this.token 		= 'input[name^=_token]';
-		this.search		= 'input[name=search_val]';
+		this.search		= 'input[type=search][name^=search]';
 		this.res		= 'input[type=hidden][name^=search]';
 		this.resList	= 'ul[name=result_list]';
 		this.list		= 'li';
@@ -129,6 +129,8 @@ SearchSelect.prototype = {
 			for (clas in _this.classes) {
 				let cur_el = _this.getters.fullEl(clas);
 				if (Types.isUndefined(cur_el)) {
+					continue;
+				} else if (!DOM.isEl(cur_el)) {
 					continue;
 				}
 
