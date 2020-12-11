@@ -38,7 +38,9 @@ SearchSelect = function (data) {
 	if (!Types.isObject(data)) {
 		throw "SearchSelect data is not type of Object!";
 	}
+	
 	this.setters.el(data.el);
+	this.checkEls();
 
 	let props = data.data;
 	if (!Types.isObject(props)) {
@@ -112,6 +114,21 @@ SearchSelect.prototype = {
 	notFoundList: [
 		{ txt: "Nothing found!" }
 	],
+
+	checkEls: function () {
+		if (!DOM.isEl(this.getters.el())) {
+			throw "SearchSelect: main element is not find! Selector: " + this.getters.el();
+		}
+		if (!DOM.isEl(this.getters.searchEl())) {
+			throw "SearchSelect: search element is not find! Selector: " + this.getters.searchEl();
+		}
+		if (!DOM.isEl(this.getters.resEl())) {
+			throw "SearchSelect: result element is not find! Selector: " + this.getters.resEl();
+		}
+		if (!DOM.isEl(this.getters.resListEl())) {
+			throw "SearchSelect: result list element is not find! Selector: " + this.getters.resListEl();
+		}
+	},
 
 	setters: function (_this) {
 		this.parent = _this;
@@ -301,7 +318,7 @@ SearchSelect.prototype = {
 	getters: function (_this) {
 		this.parent = _this;
 
-		this.el = function () {
+		this.el 				= function () {
 			return this.fullEl('el');
 		};
 		// возвращает полный селектор для элемента el
