@@ -355,6 +355,9 @@ SearchSelect.prototype = {
 		this.searchVal 			= function () {
 			return DOM.getVal(this.searchEl());
 		};
+		this.res				= function () {
+			return DOM.getVal(this.resEl());
+		};
 
 		this.handler 			= function () {
 			return this.parent.handler;
@@ -515,7 +518,13 @@ SearchSelect.prototype = {
 	res: function (_this) {
 		this.parent = _this;
 
-		this.set 	= function (data) {
+		this.isChange	= function (newRes) {
+			if (newRes !== this.parent.getters.res()) {
+				return true;
+			}
+			return false;
+		};
+		this.set 		= function (data) {
 			if (!Types.isObject(data)) {
 				throw "Result selected is not type of Object!";
 			}
@@ -531,7 +540,7 @@ SearchSelect.prototype = {
 				txt = data.txt;
 			}
 			
-			if (_this.isEBeforeChange) {
+			if (_this.isEBeforeChange && this.isChange(val)) {
 				_this.eBeforeChangeTrigger(txt, val);
 			}
 			
@@ -539,11 +548,14 @@ SearchSelect.prototype = {
 			_this.setters.search(txt);
 			DOM.setAttr(_this.getters.searchEl(), 'class', _this.classes.search + ' ' + _this.classes.resSelected);
 		};
-		this.reset 	= function () {
+		this.reset 		= function () {
 			let _this = this.parent;
-			
+
 			let val = "";
-			
+			if (_this.isEBeforeChange && this.isChange(val)) {
+				_this.eBeforeChangeTrigger(_this.getters.searchVal(), val);
+			}
+
 			_this.setters.res(val);
 			DOM.setAttr(_this.getters.searchEl(), 'class', _this.classes.search + ' ' + _this.classes.resNotSelected);
 		};
