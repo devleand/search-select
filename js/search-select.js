@@ -544,10 +544,6 @@ SearchSelect.prototype = {
 			
 			let val = "";
 			
-			if (_this.isEBeforeChange) {
-				_this.eBeforeChangeTrigger(_this.getters.searchVal(), val);
-			}
-			
 			_this.setters.res(val);
 			DOM.setAttr(_this.getters.searchEl(), 'class', _this.classes.search + ' ' + _this.classes.resNotSelected);
 		};
