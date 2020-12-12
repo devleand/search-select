@@ -467,7 +467,6 @@ SearchSelect.prototype = {
 					console.error(e.name + " " + e.message + e.stack);
 				}
 			} else {
-				_this.resList.reset();
 				_this.resList.show();
 			}
 		};
