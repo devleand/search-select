@@ -106,6 +106,13 @@ SearchSelect.prototype = {
 	isShowAll: true,
 	// вызывать ли обработчик перед присвоением скрытому полю выбранного пользователем значения
 	isEBeforeChange: false,
+	eBeforeChangeTrigger: function (txt, val) {
+		let data = {
+			txt: txt,
+			val: val
+		};
+		this.eBeforeChange(data);
+	},
 	ajaxErrorMsg: "The request failed!",
 	// минимальная длинна слова, с которой начинается поиск
 	searchMinLen: 1,
@@ -346,11 +353,6 @@ SearchSelect.prototype = {
 		};
 
 		this.searchVal 			= function () {
-			let _this = this.parent;
-			if (!DOM.isEl(this.searchEl())) {
-				throw "SearchSelect.els.search is not exist!";
-			}
-
 			return DOM.getVal(this.searchEl());
 		};
 
@@ -529,14 +531,26 @@ SearchSelect.prototype = {
 				val = data.val;
 				txt = data.txt;
 			}
+			
+			if (_this.isEBeforeChange) {
+				_this.eBeforeChangeTrigger(txt, val);
+			}
+			
 			_this.setters.res(val);
 			_this.setters.search(txt);
-			DOM.setAttr(_this.getters.searchEl(), 'class',_this.classes.search + ' ' + _this.classes.resSelected);
+			DOM.setAttr(_this.getters.searchEl(), 'class', _this.classes.search + ' ' + _this.classes.resSelected);
 		};
 		this.reset 	= function () {
 			let _this = this.parent;
-			_this.setters.res("");
-			DOM.setAttr(_this.getters.searchEl(), 'class',_this.classes.search + ' ' + _this.classes.resNotSelected);
+			
+			let val = "";
+			
+			if (_this.isEBeforeChange) {
+				_this.eBeforeChangeTrigger(_this.getters.searchVal(), val);
+			}
+			
+			_this.setters.res(val);
+			DOM.setAttr(_this.getters.searchEl(), 'class', _this.classes.search + ' ' + _this.classes.resNotSelected);
 		};
 	},
 

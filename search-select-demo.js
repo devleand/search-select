@@ -21,8 +21,8 @@ let new_search_select = new SearchSelect(
             isShowAll: true,
             // вызывать ли обработчик перед присвоением скрытому полю выбранного пользователем значения
             isEBeforeChange: true,
-            // сам обработчик, принимает 2 аргумента - выбранный пользователем элемент (текст и значение)
-            eBeforeChange: function (txt, val) {},
+            // сам обработчик, принимает 1 аргумент - { txt: "Selected text", val: "Selected value" }
+            eBeforeChange: function (data) {},
             // данное сообщение будет выведено, если запрос к handler не удастся
             ajaxErrorMsg: "",
 
