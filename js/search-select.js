@@ -111,7 +111,11 @@ SearchSelect.prototype = {
 			txt: txt,
 			val: val
 		};
-		this.eBeforeChange(data);
+		if (Types.isObject(this.eBeforeChange)) {
+			this.eBeforeChange.handler(data);
+		} else {
+			this.eBeforeChange(data);
+		}
 	},
 	ajaxErrorMsg: "The request failed!",
 	// минимальная длинна слова, с которой начинается поиск
@@ -217,7 +221,7 @@ SearchSelect.prototype = {
 			}
 		};
 		this.eBeforeChange   = function (handler) {
-			if (!Types.isFunction(handler)) {
+			if (!Types.isFunction(handler) && !Types.isObject(handler)) {
 				throw "You forgot to pass a handler for eBeforeChange!";
 			}
 			this.parent.eBeforeChange = handler;
