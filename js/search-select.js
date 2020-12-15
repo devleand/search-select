@@ -38,7 +38,7 @@ SearchSelect = function (data) {
 	if (!Types.isObject(data)) {
 		throw "SearchSelect data is not type of Object!";
 	}
-	
+
 	this.setters.el(data.el);
 	this.checkEls();
 
@@ -85,9 +85,9 @@ SearchSelect.prototype = {
 
 	// селекторы элементов (относительно основного блока)
 	els: function () {
-		this.token 		= 'input[name^=_token]';
-		this.search		= 'input[type=search][name^=search]';
-		this.res		= 'input[type=hidden][name^=search]';
+		this.token 		= 'input[type=hidden].search-token';
+		this.search		= 'input.search-pole';
+		this.res		= 'input[type=hidden].result-selected';
 		this.resList	= 'ul[name=result_list]';
 		this.list		= 'li';
 	},
@@ -250,7 +250,7 @@ SearchSelect.prototype = {
 		};
 		this.selected		 = function (selected) {
 			let _this = this.parent;
-			
+
 			let el 				= _this.getters.el();
 			let selected_attr 	= _this.attrs.selected;
 			if (DOM.hasAttr(el, selected_attr)) {
@@ -263,7 +263,7 @@ SearchSelect.prototype = {
 					}
 				}
 			}
-			
+
 			if (Types.isObject(selected)) {
 				_this.res.set(selected);
 			} else {
@@ -272,7 +272,7 @@ SearchSelect.prototype = {
 		};
 		this.constList		 = function (constList) {
 			let _this = this.parent;
-			
+
 			let el 				= _this.getters.el();
 			let const_list_attr = _this.attrs.constList;
 			if (DOM.hasAttr(el, const_list_attr)) {
@@ -285,7 +285,7 @@ SearchSelect.prototype = {
 					}
 				}
 			}
-			
+
 			if (Types.isObject(constList) || Types.isArray(constList)) {
 				_this.constList = constList;
 			}
@@ -298,7 +298,7 @@ SearchSelect.prototype = {
 		};
 		this.notFoundList 	 = function (notFoundList) {
 			let _this = this.parent;
-			
+
 			let el 					= _this.getters.el();
 			let not_found_list_attr = _this.attrs.notFoundList;
 			if (DOM.hasAttr(el, not_found_list_attr)) {
@@ -311,7 +311,7 @@ SearchSelect.prototype = {
 					}
 				}
 			}
-			
+
 			if (Types.isObject(notFoundList) || Types.isArray(notFoundList)) {
 				_this.notFoundList = notFoundList;
 			}
@@ -533,7 +533,7 @@ SearchSelect.prototype = {
 				throw "Result selected is not type of Object!";
 			}
 			let _this = this.parent;
-			
+
 			let val;
 			let txt;
 			if (data instanceof ResItem) {
@@ -543,11 +543,11 @@ SearchSelect.prototype = {
 				val = data.val;
 				txt = data.txt;
 			}
-			
+
 			if (_this.isEBeforeChange && this.isChange(val)) {
 				_this.eBeforeChangeTrigger(txt, val);
 			}
-			
+
 			_this.setters.res(val);
 			_this.setters.search(txt);
 			DOM.setAttr(_this.getters.searchEl(), 'class', _this.classes.search + ' ' + _this.classes.resSelected);
@@ -628,13 +628,13 @@ ResItem = function (props, isGet = false) {
 
 	if (isGet) {
 		let li_el = props.el;
-		
+
 		this.setters.virtual.class(DOM.getAttr(li_el, this.attrs.class, false));
 		this.setters.virtual.val(DOM.getAttr(li_el, this.attrs.val, false));
 		this.setters.virtual.type(DOM.getAttr(li_el, this.attrs.type, false));
 		this.setters.virtual.isResult(DOM.getAttr(li_el, this.attrs.isResult, false));
 		this.setters.virtual.txt(DOM.getTxt(li_el, false));
-		
+
 		this.set(li_el);
 	} else {
 		if (!!props.class) {
