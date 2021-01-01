@@ -550,7 +550,9 @@ SearchSelect.prototype = {
 
 			_this.setters.res(val);
 			_this.setters.search(txt);
-			DOM.setAttr(_this.getters.searchEl(), 'class', _this.classes.search + ' ' + _this.classes.resSelected);
+			
+			DOM.classRemove(_this.getters.searchEl(), _this.classes.resNotSelected);
+			DOM.classAdd(_this.getters.searchEl(), _this.classes.resSelected);
 		};
 		this.reset 		= function () {
 			let _this = this.parent;
@@ -561,7 +563,9 @@ SearchSelect.prototype = {
 			}
 
 			_this.setters.res(val);
-			DOM.setAttr(_this.getters.searchEl(), 'class', _this.classes.search + ' ' + _this.classes.resNotSelected);
+			
+			DOM.classRemove(_this.getters.searchEl(), _this.classes.resSelected);
+			DOM.classAdd(_this.getters.searchEl(), _this.classes.resNotSelected);
 		};
 	},
 
