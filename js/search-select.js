@@ -550,7 +550,7 @@ SearchSelect.prototype = {
 
 			_this.setters.res(val);
 			_this.setters.search(txt);
-			
+
 			DOM.classRemove(_this.getters.searchEl(), _this.classes.resNotSelected);
 			DOM.classAdd(_this.getters.searchEl(), _this.classes.resSelected);
 		};
@@ -563,7 +563,7 @@ SearchSelect.prototype = {
 			}
 
 			_this.setters.res(val);
-			
+
 			DOM.classRemove(_this.getters.searchEl(), _this.classes.resSelected);
 			DOM.classAdd(_this.getters.searchEl(), _this.classes.resNotSelected);
 		};
