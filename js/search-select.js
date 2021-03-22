@@ -1,9 +1,17 @@
-SearchSelectEvent = function (data) {
-	if (!(data.SearchSelect instanceof SearchSelect)) {
+/**
+ * @param {{
+ * 		SearchSelect: SearchSelect,
+ * 		handleEvent: Function,
+ * 		isXHR: Boolean|mixed
+ * 	}} data
+ * @constructor
+ */
+var SearchSelectEvent = function (data) {
+	if (! (data.SearchSelect instanceof SearchSelect)) {
 		throw "SearchSelectEvent: data.SearchSelect is not object of class SearchSelect!";
 	}
 	this.SearchSelect = data.SearchSelect;
-	if (!Types.isFunction(data.handleEvent)) {
+	if (! Types.isFunction(data.handleEvent)) {
 		throw "SearchSelectEvent: data.handleEvent is not type of Function!";
 	}
 	this._handleEvent = data.handleEvent;
@@ -12,10 +20,18 @@ SearchSelectEvent = function (data) {
 	}
 };
 SearchSelectEvent.prototype = {
+	/**
+	 * @type {Boolean}
+	 */
 	isXHR: false,
+
+	/**
+	 * @type {Object}
+	 */
 	XHR: {
 		abort: function () {}
 	},
+
 	handleEvent: function (e) {
 		if (this.isXHR) {
 			this.XHR.abort();
@@ -24,48 +40,22 @@ SearchSelectEvent.prototype = {
 	}
 };
 
-SearchSelect = function (data) {
-	this.classes		= new this.classes();
-	this.placeholder 	= new this.placeholder();
-	this.attrs 			= new this.attrs();
-	this.els 			= new this.els();
-	this.setters 		= new this.setters(this);
-	this.getters 		= new this.getters(this);
-	this.res 			= new this.res(this);
-	this.resList 		= new this.resList(this);
-	this.e 				= new this.e(this);
+var SearchSelect = function (data) {
+	this.init();
 
-	if (!Types.isObject(data)) {
+	if (! Types.isObject(data)) {
 		throw "SearchSelect data is not type of Object!";
 	}
 
-	this.setters.el(data.el);
-	this.checkEls();
-
-	let props = data.data;
-	if (!Types.isObject(props)) {
-		props = {};
-	}
-
-	this.setters.handler(props.handler, true);
-	this.setters.isShowAll(props.isShowAll, true);
-	this.setters.isEBeforeChange(props.isEBeforeChange, true);
-	if (this.isEBeforeChange) {
-		this.setters.eBeforeChange(props.eBeforeChange);
-	}
-	this.setters.ajaxErrorMsg(props.ajaxErrorMsg);
-	this.setters.searchMinLen(props.searchMinLen, true);
-	this.setters.classes(props.classes);
-	this.setters.placeholder(props.placeholder);
-	this.setters.selected(props.selected);
-	this.setters.constList(props.constList);
-	this.setters.notFoundList(props.notFoundList);
+	this.set(data);
 
 	this.e.set();
 };
 
 SearchSelect.prototype = {
-	// классы соответствующих элементов (исключительно пользовательский объект)
+	/**
+	 * @type {Object} Классы соответствующих элементов (исключительно пользовательский объект).
+	 */
 	classes: function () {
 		let not_selected = 'not-selected';
 
@@ -78,12 +68,17 @@ SearchSelect.prototype = {
 		this.resSelected 		= 'selected';
 		this.resNotSelected 	= not_selected;
 	},
+	/**
+	 * @type {Object}
+	 */
 	placeholder: function () {
 		this.attr 	= 'placeholder';
 		this.val 	= 'Search';
 	},
 
-	// селекторы элементов (относительно основного блока)
+	/**
+	 * @type {Object} Селекторы элементов (относительно основного блока).
+	 */
 	els: function () {
 		this.token 		= 'input[type=hidden].search-token';
 		this.search		= 'input.search-pole';
@@ -91,7 +86,9 @@ SearchSelect.prototype = {
 		this.resList	= 'ul[name=result_list]';
 		this.list		= 'li';
 	},
-	// названия атрибутов для соответствующих свойств класса
+	/**
+	 * @type {Object}  Названия атрибутов для соответствующих свойств класса.
+	 */
 	attrs: function () {
 		this.handler			= "data-handler";
 		this.isShowAll			= "data-is-show-all";
@@ -102,10 +99,20 @@ SearchSelect.prototype = {
 		this.notFoundList		= "data-not-found-list";
 	},
 
-	// показывать ли все значения списка при нажатии на пробел/при клике
+	/**
+	 * @type {Boolean} Показывать ли все значения списка при нажатии на пробел/при клике.
+	 */
 	isShowAll: true,
-	// вызывать ли обработчик перед присвоением скрытому полю выбранного пользователем значения
+	/**
+	 * @type {Boolean} Вызывать ли обработчик перед присвоением скрытому полю выбранного пользователем значения.
+	 */
 	isEBeforeChange: false,
+	/**
+	 * Вызвать обработчик (перед присвоением значения полю).
+	 *
+	 * @param {String} txt		Текст выбранного значения.
+	 * @param {String} val		Выбранное значение.
+	 */
 	eBeforeChangeTrigger: function (txt, val) {
 		let data = {
 			txt: txt,
@@ -117,144 +124,229 @@ SearchSelect.prototype = {
 			this.eBeforeChange(data);
 		}
 	},
+	/**
+	 * @type {String}
+	 */
 	ajaxErrorMsg: "The request failed!",
-	// минимальная длинна слова, с которой начинается поиск
+	/**
+	 * @type {Number} Минимальная длинна слова, с которой начинается поиск
+	 */
 	searchMinLen: 1,
 
+	/**
+	 * @type {Array}
+	 */
 	constList: [],
+	/**
+	 * @type {Object[]}
+	 */
 	notFoundList: [
 		{ txt: "Nothing found!" }
 	],
 
+	init: function () {
+		this.classes		= new this.classes();
+		this.placeholder 	= new this.placeholder();
+		this.attrs 			= new this.attrs();
+		this.els 			= new this.els();
+		this.setters 		= new this.setters(this);
+		this.getters 		= new this.getters(this);
+		this.res 			= new this.res(this);
+		this.resList 		= new this.resList(this);
+		this.e 				= new this.e(this);
+	},
+	/**
+	 * @param {Object} data
+	 */
+	set: function (data) {
+		this.setters.el(data.el);
+		this.checkEls();
+
+		let props = data.data;
+		if (! Types.isObject(props)) {
+			props = {};
+		}
+
+		this.setters.handler(props.handler);
+		this.setters.isShowAll(props.isShowAll);
+		this.setters.isEBeforeChange(props.isEBeforeChange);
+		if (this.isEBeforeChange) {
+			this.setters.eBeforeChange(props.eBeforeChange);
+		}
+		this.setters.ajaxErrorMsg(props.ajaxErrorMsg);
+		this.setters.searchMinLen(props.searchMinLen);
+		this.setters.classes(props.classes);
+		this.setters.placeholder(props.placeholder);
+		this.setters.selected(props.selected);
+		this.setters.constList(props.constList);
+		this.setters.notFoundList(props.notFoundList);
+	},
+
+	/**
+	 * Проверить существование элемента в DOM. Выбросить исключение, если элемента не существует.
+	 *
+	 * @param {(string | DOMElements | NodeList | Element)} el
+	 */
+	check: function (el) {
+		el = new DOMElements(el);
+		if (el.length == 0) throw "Element " + el.selector + " not found";
+	},
+	/**
+	 * Проверяет существование обязательных элементов DOM.
+	 */
 	checkEls: function () {
-		if (!DOM.isEl(this.getters.el())) {
-			throw "SearchSelect: main element is not find! Selector: " + this.getters.el();
-		}
-		if (!DOM.isEl(this.getters.searchEl())) {
-			throw "SearchSelect: search element is not find! Selector: " + this.getters.searchEl();
-		}
-		if (!DOM.isEl(this.getters.resEl())) {
-			throw "SearchSelect: result element is not find! Selector: " + this.getters.resEl();
-		}
-		if (!DOM.isEl(this.getters.resListEl())) {
-			throw "SearchSelect: result list element is not find! Selector: " + this.getters.resListEl();
-		}
+		this.check(this.getters.el());
+		this.check(this.getters.searchEl());
+		this.check(this.getters.resEl());
+		this.check(this.getters.resListEl());
 	},
 
 	setters: function (_this) {
 		this.parent = _this;
 
+		/**
+		 * @param {Object|mixed} classes
+		 */
 		this.classes 		 = function (classes) {
 			let _this = this.parent;
-			let clas;
 
 			if (Types.isObject(classes)) {
-				for (clas in classes) {
-					_this.classes[clas] = classes[clas];
+				for (let _class in classes) {
+					_this.classes[_class] = classes[_class];
 				}
 			}
 
-			for (clas in _this.classes) {
-				let cur_el = _this.getters.fullEl(clas);
-				if (Types.isUndefined(cur_el)) {
-					continue;
-				} else if (!DOM.isEl(cur_el)) {
+			for (let _class in _this.classes) {
+				if (! _this.els.hasOwnProperty(_class)) continue;
+
+				let cur_el = new DOMElements(_this.els[_class]);
+
+				if (cur_el.length == 0) {
 					continue;
 				}
 
-				let classes_el = DOM.classGetList(cur_el);
+				let classes_el = cur_el.classList();
 				if (classes_el.length == 0) {
-					let classes = _this.classes[clas].split(' ');
+					let classes = _this.classes[_class].split(' ');
 					for (let i = 0; i < classes.length; i++) {
-						DOM.classAdd(cur_el, classes[i]);
+						cur_el.addClass(classes[i]);
 					}
 				}
 			}
 		};
+
+		/**
+		 * @param {String | mixed} placeholder
+		 */
 		this.placeholder 	 = function (placeholder) {
 			let _this = this.parent;
 			let attr = _this.placeholder.attr;
 			let search_el = _this.getters.searchEl();
 			if (Types.isString(placeholder)) {
-				DOM.setAttr(search_el, attr, placeholder);
-			} else if (!DOM.hasAttr(search_el, attr)) {
-				DOM.setAttr(search_el, attr, _this.placeholder.val);
+				search_el.attr(attr, placeholder)
+			} else if (! search_el.hasAttr(attr)) {
+				search_el.attr(attr, _this.placeholder.val);
 			}
 		};
+		/**
+		 * @param {(string | DOMElements | NodeList | Element)} el
+		 */
 		this.el 			 = function (el) {
-			let _this = this.parent;
-			if (!Types.isString(el)) {
-				throw "SearchSelect data.el is not type of String!";
-			}
-			if (!DOM.isEl(el)) {
-				throw "SearchSelect data.el does not exist!";
-			}
-			_this.els.el = el;
+			this.parent.els.el = new DOMElements(el);
 		};
-		this.handler 		 = function (handler, isAuto = false) {
-			// isAuto			- если true, то, если значение handler некорректно, попытается найт его в атрибуте
+		/**
+		 * @param {String | mixed} handler 	Путь к обработчику скрипта, может быть не передан
+		 * 									(тогда программа попытается найти его в атрибуте главного блока).
+		 */
+		this.handler 		 = function (handler) {
 			let _this = this.parent;
 			if (Types.isString(handler)) {
 				_this.handler = handler;
-			} else if (isAuto && DOM.hasAttr(_this.getters.el(), _this.attrs.handler)) {
-				_this.handler = DOM.getAttr(_this.getters.el(), _this.attrs.handler);
+			} else if (_this.getters.el().hasAttr(_this.attrs.handler)) {
+				_this.handler = _this.getters.el().attr(_this.attrs.handler);
 			} else {
 				throw "SearchSelect.handler is not define!";
 			}
 		};
-		this.isShowAll 		 = function (isShowAll, isAuto = false) {
-			// isAuto		- если true, то, если значение handler некорректно, попытается найти в атрибуте
+		/**
+		 * @param {string} flag
+		 * @param {boolean | mixed} isActive
+		 * @param {string | null} attr		Ключ атрибута массива SearchSelect.attrs с именем атрибута, из которого,
+		 * 									если не корректно isActive, будет взято значение флага.
+		 * 									Если не указано, в качестве ключа будет использовано значение flag.
+		 */
+		this.flag = function (flag, isActive, attr = null) {
 			let _this = this.parent;
-			if (Types.isBool(isShowAll)) {
-				_this.isShowAll = isShowAll;
-			} else if (isAuto && DOM.hasAttr(_this.getters.el(), _this.attrs.isShowAll)) {
-				_this.isShowAll = Types.toBool(DOM.getAttr(_this.getters.el(), _this.attrs.isShowAll));
+			attr = Types.isNull(attr) ? flag : attr;
+
+			if (Types.isBool(isActive)) {
+				_this[flag] = isActive;
+			} else if (_this.getters.el().hasAttr(_this.attrs[attr])) {
+				_this[flag] = Types.toBool(_this.getters.el().attr(_this.attrs[attr]));
 			}
 		};
-		this.isEBeforeChange = function (isEBeforeChange, isAuto = false) {
-			// isAuto	- если true, то, если значение isEBeforeChange некорректно, попытается найти в атрибуте
-			let _this = this.parent;
-			if (Types.isBool(isEBeforeChange)) {
-				_this.isEBeforeChange = isEBeforeChange;
-			} else if (isAuto && DOM.hasAttr(_this.getters.el(), _this.attrs.isEBeforeChange)) {
-				_this.isEBeforeChange = Types.toBool(DOM.getAttr(_this.getters.el(), _this.attrs.isEBeforeChange));
-			}
+		/**
+		 * @param {Boolean|mixed} isShowAll
+		 */
+		this.isShowAll 		 = function (isShowAll) {
+			this.flag('isShowAll', isShowAll);
 		};
+		/**
+		 * @param {Boolean|mixed} isEBeforeChange
+		 */
+		this.isEBeforeChange = function (isEBeforeChange) {
+			this.flag('isEBeforeChange', isEBeforeChange);
+		};
+		/**
+		 * @param {Function|Object} handler
+		 */
 		this.eBeforeChange   = function (handler) {
-			if (!Types.isFunction(handler) && !Types.isObject(handler)) {
+			if (! Types.isFunction(handler) && ! Types.isObject(handler)) {
 				throw "You forgot to pass a handler for eBeforeChange!";
 			}
 			this.parent.eBeforeChange = handler;
 		};
+		/**
+		 * @param {String|mixed} msg
+		 */
 		this.ajaxErrorMsg	 = function (msg) {
 			if (Types.isString(msg)) {
 				this.parent.ajaxErrorMsg = msg;
 			}
 		};
-		this.searchMinLen	 = function (searchMinLen, isAuto = false) {
-			// isAuto	- если true, то, если значение searchMinLen некорректно, попытается найти в атрибуте
+		/**
+		 * @param {Number|mixed} searchMinLen
+		 */
+		this.searchMinLen	 = function (searchMinLen) {
 			let _this = this.parent;
 			if (Types.isNumber(searchMinLen)) {
 				_this.searchMinLen = searchMinLen;
-			} else if (isAuto && DOM.hasAttr(_this.getters.el(), _this.attrs.searchMinLen)) {
-				_this.searchMinLen = Types.toNumber(DOM.getAttr(_this.getters.el(), _this.attrs.searchMinLen));
+			} else if (_this.getters.el().hasAttr(_this.attrs.searchMinLen)) {
+				_this.searchMinLen = Types.toNumber(_this.getters.el().attr(_this.attrs.searchMinLen));
 			}
 		};
+		/**
+		 * @param {string} val
+		 */
 		this.search			 = function (val) {
-			let _this = this.parent;
-			DOM.setVal(_this.getters.searchEl(), val);
+			this.parent.getters.searchEl().val(val);
 		};
+		/**
+		 * @param {string} res
+		 */
 		this.res			 = function (res) {
-			let _this = this.parent;
-			DOM.setVal(_this.getters.resEl(), res);
+			this.parent.getters.resEl().val(res);
 		};
+		/**
+		 * @param {Object|mixed} selected
+		 */
 		this.selected		 = function (selected) {
 			let _this = this.parent;
 
 			let el 				= _this.getters.el();
 			let selected_attr 	= _this.attrs.selected;
-			if (DOM.hasAttr(el, selected_attr)) {
-				let selected_attr_val = DOM.getAttr(el, selected_attr);
+			if (el.hasAttr(selected_attr)) {
+				let selected_attr_val = el.attr(selected_attr);
 				if (Types.isString(selected_attr_val)) {
 					try {
 						selected = JSON.parse(selected_attr_val);
@@ -270,13 +362,16 @@ SearchSelect.prototype = {
 				_this.res.reset();
 			}
 		};
+		/**
+		 * @param {Object|Array|mixed} constList
+		 */
 		this.constList		 = function (constList) {
 			let _this = this.parent;
 
 			let el 				= _this.getters.el();
 			let const_list_attr = _this.attrs.constList;
-			if (DOM.hasAttr(el, const_list_attr)) {
-				let const_list_attr_val = DOM.getAttr(el, const_list_attr);
+			if (el.hasAttr(const_list_attr)) {
+				let const_list_attr_val = el.attr(const_list_attr);
 				if (Types.isString(const_list_attr_val)) {
 					try {
 						constList = JSON.parse(const_list_attr_val);
@@ -296,13 +391,16 @@ SearchSelect.prototype = {
 			}
 			_this.resList.set(const_list);
 		};
+		/**
+		 * @param {Object|Array|mixed} notFoundList
+		 */
 		this.notFoundList 	 = function (notFoundList) {
 			let _this = this.parent;
 
 			let el 					= _this.getters.el();
 			let not_found_list_attr = _this.attrs.notFoundList;
-			if (DOM.hasAttr(el, not_found_list_attr)) {
-				let not_found_list_attr_val = DOM.getAttr(el, not_found_list_attr);
+			if (el.hasAttr(not_found_list_attr)) {
+				let not_found_list_attr_val = el.attr(not_found_list_attr);
 				if (Types.isString(not_found_list_attr_val)) {
 					try {
 						notFoundList = JSON.parse(not_found_list_attr_val);
@@ -329,51 +427,102 @@ SearchSelect.prototype = {
 	getters: function (_this) {
 		this.parent = _this;
 
-		this.el 				= function () {
-			return this.fullEl('el');
+		/**
+		 * @return {DOMElements}
+		 */
+		this.el = function () {
+			return _this.els.el;
 		};
-		// возвращает полный селектор для элемента el
-		this.fullEl 			= function (el) {
-			let _this = this.parent;
-			if (Types.isUndefined(_this.els[el])) {
-				return undefined;
-			}
-			return _this.els[el] == _this.els.el ? _this.els[el] : _this.els.el + " " + _this.els[el];
+
+		/**
+		 * @param {string|DOMElements} el
+		 * @return {string}
+		 */
+		this.selector = function (el) {
+			if (el instanceof DOMElements) return el.selector ?? "";
+			else if (Types.isString(el)) return el;
+			else throw "undefined type of parameter el";
 		};
-		this.searchEl 			= function () {
-			return this.fullEl('search');
+		/**
+		 * @param {string} el
+		 * @return {string}
+		 */
+		this.dependentSelector = function (el) {
+			return this.selector(this.el()) + " " + this.selector(el);
 		};
+
+		/**
+		 * @param {string} el
+		 * @param {boolean} isDependent
+		 * @return {DOMElements}
+		 */
+		this.getEl = function (el, isDependent = true) {
+			return new DOMElements(isDependent ? this.dependentSelector(_this.els[el]) : _this.els[el]);
+		};
+		/**
+		 * @return {DOMElements}
+		 */
+		this.searchEl = function () {
+			return this.getEl('search');
+		};
+		/**
+		 * @return {DOMElements}
+		 */
 		this.tokenEl 			= function () {
-			return this.fullEl('token');
+			return this.getEl('token');
 		};
+		/**
+		 * @return {DOMElements}
+		 */
 		this.resEl 				= function () {
-			return this.fullEl('res');
+			return this.getEl('res');
 		};
+		/**
+		 * @return {DOMElements}
+		 */
 		this.resListEl 			= function () {
-			return this.fullEl('resList');
+			return this.getEl('resList');
 		};
+		/**
+		 * @return {DOMElements}
+		 */
 		this.listEl 			= function () {
-			return this.fullEl('list');
+			return this.getEl('list');
 		};
 
+		/**
+		 * @return {string}
+		 */
 		this.searchVal 			= function () {
-			return DOM.getVal(this.searchEl());
+			return this.searchEl().val();
 		};
+		/**
+		 * @return {string}
+		 */
 		this.res				= function () {
-			return DOM.getVal(this.resEl());
+			return this.resEl().val();
 		};
 
+		/**
+		 * @return {string}
+		 */
 		this.handler 			= function () {
 			return this.parent.handler;
 		};
+		/**
+		 * @return {string}
+		 */
 		this.token				= function () {
 			let token_el = this.tokenEl();
-			if (DOM.isEl(token_el)) {
-				return DOM.getVal(token_el);
+			if (token_el.length > 0) {
+				return token_el.val();
 			} else {
 				return "";
 			}
 		}
+		/**
+		 * @return {{search: string, token: string}}
+		 */
 		this.dataForHandler 	= function () {
 			let __this = this;
 
@@ -384,8 +533,12 @@ SearchSelect.prototype = {
 		};
 	},
 
+	/**
+	 * @param {Object} json
+	 * @return {string}
+	 */
 	jsonToQuery: function (json) {
-		if (!Types.isObject(json)) {
+		if (! Types.isObject(json)) {
 			throw "SearchSelect.jsonInQuery(json) - parameter json is not Object!";
 		}
 		let query = "";
@@ -395,6 +548,11 @@ SearchSelect.prototype = {
 
 		return query;
 	},
+	/**
+	 * @param {String|Object} query
+	 * @param {Function} callback
+	 * @return {XMLHttpRequest}
+	 */
 	send: function (query, callback) {
 		if (Types.isObject(query)) {
 			query = this.jsonToQuery(query);
@@ -431,33 +589,33 @@ SearchSelect.prototype = {
 			let _this = this.parent;
 			let __this = this;
 
-			DOM.addEventListener(_this.getters.searchEl(), "click", new SearchSelectEvent({
+			_this.getters.searchEl().on('click', new SearchSelectEvent({
 				SearchSelect: _this,
 				handleEvent: __this.searchClick,
 				isXHR: true
-			}));
-			DOM.addEventListener(_this.getters.searchEl(), "input", new SearchSelectEvent({
+			})).
+			on("input", new SearchSelectEvent({
 				SearchSelect: _this,
 				handleEvent: __this.searchInput,
 				isXHR: true
 			}));
-			DOM.addEventListener("html", "mouseup", new SearchSelectEvent({
+
+			DOMElements.make("html").on("mouseup", new SearchSelectEvent({
 				SearchSelect: _this,
 				handleEvent: __this.htmlMouseUp
-			}), true);
-			DOM.addEventListener("html", "keyup", new SearchSelectEvent({
+			}), true).
+			on("keyup", new SearchSelectEvent({
 				SearchSelect: _this,
 				handleEvent: __this.htmlKeyUp
 			}));
-			DOM.addEventListener(_this.getters.resListEl(), "click", new SearchSelectEvent({
+
+			_this.getters.resListEl().on("click", new SearchSelectEvent({
 				SearchSelect: _this,
 				handleEvent: __this.resListClick
 			}));
 		};
 
 		this.searchClick 	= function (e) {
-			let _this = this.SearchSelect;
-
 			if (_this.isShowAll) {
 				try {
 					let query = {
@@ -469,17 +627,15 @@ SearchSelect.prototype = {
 						_this.resList.set(data);
 						_this.resList.show();
 					});
-				} catch (e) {
+				} catch (err) {
 					_this.resList.hide();
-					console.error(e.name + " " + e.message + e.stack);
+					console.error(err.name + " " + err.message + err.stack);
 				}
 			} else {
 				_this.resList.show();
 			}
 		};
 		this.searchInput 	= function (e) {
-			let _this = this.SearchSelect;
-
 			_this.res.reset();
 			if (_this.getters.searchVal().length >= _this.searchMinLen) {
 				let __this = this;
@@ -490,9 +646,9 @@ SearchSelect.prototype = {
 						res_list.set(data);
 						res_list.show();
 					});
-				} catch (e) {
+				} catch (err) {
 					_this.resList.hide();
-					console.error(e.name + " " + e.message + e.stack);
+					console.error(err.name + " " + err.message + err.stack);
 				}
 			} else {
 				_this.resList.hide();
@@ -500,17 +656,16 @@ SearchSelect.prototype = {
 		};
 		this.htmlKeyUp 		= function (e) {
 			if (e.keyCode == 9) {
-				this.SearchSelect.resList.hide();
+				_this.resList.hide();
 			}
 		};
 		this.htmlMouseUp 	= function (e) {
-			this.SearchSelect.resList.hide();
+			_this.resList.hide();
 		};
 		this.resListClick	= function (e) {
 			let cur_li = new ResItem({
 				el: e.target
 			}, true);
-			let _this = this.SearchSelect;
 			if (cur_li.getters.isResult()) {
 				_this.res.set(cur_li);
 			} else {
@@ -522,12 +677,19 @@ SearchSelect.prototype = {
 	res: function (_this) {
 		this.parent = _this;
 
+		/**
+		 * @param {string} newRes
+		 * @return {boolean}
+		 */
 		this.isChange	= function (newRes) {
 			if (newRes !== this.parent.getters.res()) {
 				return true;
 			}
 			return false;
 		};
+		/**
+		 * @param {ResItem|{val: string, txt: string}} data
+		 */
 		this.set 		= function (data) {
 			if (!Types.isObject(data)) {
 				throw "Result selected is not type of Object!";
@@ -551,8 +713,8 @@ SearchSelect.prototype = {
 			_this.setters.res(val);
 			_this.setters.search(txt);
 
-			DOM.classRemove(_this.getters.searchEl(), _this.classes.resNotSelected);
-			DOM.classAdd(_this.getters.searchEl(), _this.classes.resSelected);
+			_this.getters.searchEl().removeClass(_this.classes.resNotSelected);
+			_this.getters.searchEl().addClass(_this.classes.resSelected);
 		};
 		this.reset 		= function () {
 			let _this = this.parent;
@@ -564,16 +726,19 @@ SearchSelect.prototype = {
 
 			_this.setters.res(val);
 
-			DOM.classRemove(_this.getters.searchEl(), _this.classes.resSelected);
-			DOM.classAdd(_this.getters.searchEl(), _this.classes.resNotSelected);
+			_this.getters.searchEl().removeClass(_this.classes.resSelected);
+			_this.getters.searchEl().addClass(_this.classes.resNotSelected);
 		};
 	},
 
 	resList: function (_this) {
 		this.parent = _this;
 
+		/**
+		 * @param {Object|Array} resList
+		 */
 		this.set 	= function (resList) {
-			if (!Types.isObject(resList) && !Types.isArray(resList)) {
+			if (! Types.isObject(resList) && ! Types.isArray(resList)) {
 				throw "SearchSelect.resList is not type of Array or Object!";
 			}
 			if (Types.isNull(resList)) {
@@ -583,28 +748,30 @@ SearchSelect.prototype = {
 
 			for (let i = 0; i < resList.length; i++) {
 				let new_li = new ResItem(resList[i]);
-				DOM.get(_this.getters.resListEl()).append(new_li.get());
+				_this.getters.resListEl().appendChild(new_li.get().get(0));
 			}
 		};
 		this.reset 	= function () {
-			let _this = this.parent;
-			let res_list = DOM.gets(_this.getters.listEl());
-			for (let i = 0; i < res_list.length; i++) {
-				let res_li = new ResItem({ el: res_list[i] }, true);
+			this.parent.getters.listEl().forEach(function (el) {
+				let res_li = new ResItem({ el: el }, true);
 				if (res_li.getters.type() !== ResItemTypes.const) {
 					res_li.remove();
 				}
-			}
+			});
 		};
 
 		this.show 	= function () {
-			DOM.show(this.parent.getters.resListEl());
+			this.parent.getters.resListEl().show();
 		};
 		this.hide 	= function () {
-			DOM.hide(this.parent.getters.resListEl());
+			this.parent.getters.resListEl().hide();
 		};
 	},
 
+	/**
+	 * @param {Function} callback
+	 * @return {XMLHttpRequest}
+	 */
 	search: function (callback) {
 		let _this = this;
 
@@ -621,23 +788,32 @@ SearchSelect.prototype = {
 	}
 };
 
-ResItemTypes = {
+/**
+ * @type {{const: string, dyn: string}}
+ */
+var ResItemTypes = {
 	dyn: "dyn",
 	const: "const"
 };
-ResItem = function (props, isGet = false) {
-	this.attrs 		= new this.attrs();
-	this.setters 	= new this.setters(this);
-	this.getters 	= new this.getters(this);
+/**
+ * @param {
+ * 		{el: string | DOMElements | NodeList | Element}
+ * 		| {class: string|mixed, val: string|mixed, type: string|mixed, isResult: Boolean|mixed, txt: string|mixed}
+ * 		} props
+ * @param {Boolean} isGet
+ * @constructor
+ */
+var ResItem = function (props, isGet = false) {
+	this.init();
 
 	if (isGet) {
-		let li_el = props.el;
+		let li_el = new DOMElements(props.el);
 
-		this.setters.virtual.class(DOM.getAttr(li_el, this.attrs.class, false));
-		this.setters.virtual.val(DOM.getAttr(li_el, this.attrs.val, false));
-		this.setters.virtual.type(DOM.getAttr(li_el, this.attrs.type, false));
-		this.setters.virtual.isResult(DOM.getAttr(li_el, this.attrs.isResult, false));
-		this.setters.virtual.txt(DOM.getTxt(li_el, false));
+		this.setters.virtual.class(li_el.attr(this.attrs.class));
+		this.setters.virtual.val(li_el.attr(this.attrs.val));
+		this.setters.virtual.type(li_el.attr(this.attrs.type));
+		this.setters.virtual.isResult(li_el.attr(this.attrs.isResult));
+		this.setters.virtual.txt(li_el.txt());
 
 		this.set(li_el);
 	} else {
@@ -661,15 +837,39 @@ ResItem = function (props, isGet = false) {
 	}
 };
 ResItem.prototype = {
+	/**
+	 * @type {DOMElements}
+	 */
 	docObj: null,
 
+	/**
+	 * @type {String}
+	 */
 	tag: "li",
+	/**
+	 * @type {String}
+	 */
 	class: "",
+	/**
+	 * @type {String}
+	 */
 	val: "",
+	/**
+	 * @type {String}
+	 */
 	type: ResItemTypes.dyn,
+	/**
+	 * @type {Boolean}
+	 */
 	isResult: true,
+	/**
+	 * @type {String}
+	 */
 	txt: "",
 
+	/**
+	 * @type {Object}
+	 */
 	attrs: function () {
 		this.class 		= "class";
 		this.val 		= "data-val";
@@ -677,15 +877,27 @@ ResItem.prototype = {
 		this.isResult	= "data-is-result";
 	},
 
+	init: function () {
+		this.attrs 		= new this.attrs();
+		this.setters 	= new this.setters(this);
+		this.getters 	= new this.getters(this);
+	},
+
+	/**
+	 * @param {DOMElements} docObj
+	 */
 	set: function (docObj) {
 		this.docObj = docObj;
 	},
+	/**
+	 * @return {DOMElements}
+	 */
 	get: function () {
 		return this.docObj;
 	},
 
 	create: function () {
-		let li = DOM.create(this.tag);
+		let li = DOMElements.create(this.tag);
 		this.set(li);
 
 		this.setters.document.class(this.getters.class());
@@ -702,7 +914,10 @@ ResItem.prototype = {
 	setters: function (_this) {
 		this.parent 	= _this;
 
-		// protected methods
+		/**
+		 * @private
+		 * @param {ResItem.setters} __this
+		 */
 		this.virtual 	= function (__this) {
 			this.parent = __this;
 
@@ -729,21 +944,25 @@ ResItem.prototype = {
 				this.parent.parent.txt = txt;
 			};
 		};
-		this.virtual 	= new this.virtual(this);
+
+		/**
+		 * @private
+		 * @param {ResItem.setters} __this
+		 */
 		this.document 	= function (__this) {
 			this.parent = __this;
 
 			this.class 		= function (_class) {
 				let _this = this.parent.parent;
-				DOM.setAttr(_this.get(), _this.attrs.class, _class, false);
+				_this.get().attr(_this.attrs.class, _class);
 			};
 			this.val 		= function (val) {
 				let _this = this.parent.parent;
-				DOM.setAttr(_this.get(), _this.attrs.val, val, false);
+				_this.get().attr(_this.attrs.val, val);
 			};
 			this.type 		= function (type) {
 				let _this = this.parent.parent;
-				DOM.setAttr(_this.get(), _this.attrs.type, type, false);
+				_this.get().attr(_this.attrs.type, type);
 			};
 			this.isResult 	= function (isResult) {
 				if (isResult) {
@@ -752,16 +971,17 @@ ResItem.prototype = {
 					isResult = "0";
 				}
 				let _this = this.parent.parent;
-				DOM.setAttr(_this.get(), _this.attrs.isResult, isResult, false);
+				_this.get().attr(_this.attrs.isResult, isResult);
 			};
 			this.txt 		= function (txt) {
 				let _this = this.parent.parent;
-				DOM.setTxt(_this.get(), txt, false);
+				_this.get().txt(txt);
 			};
 		};
+
+		this.virtual 	= new this.virtual(this);
 		this.document 	= new this.document(this);
 
-		// public methods
 		this.class 		= function (_class) {
 			this.virtual.class(_class);
 			if (!Types.isNull(this.parent.get())) {

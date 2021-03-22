@@ -1,12 +1,13 @@
 <!doctype html>
-<html lang = "en">
+<html lang="en">
 <head>
-    <meta charset = "UTF-8">
-    <meta name = "viewport" content = "width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv = "X-UA-Compatible" content = "ie=edge">
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Example</title>
 
-    <link rel = "stylesheet" href = "css/search-select.css">
+    <link rel="stylesheet" href="css/search-select.css">
     <script src="lib/js/types.js"></script>
     <script src="lib/js/dom.js"></script>
     <script src="js/search-select.js"></script>
@@ -31,16 +32,16 @@
 																		]")
 -->
 
-<div id = "search-select-demo" 
-	data-handler = "search-select-demo.php" 
-	data-search-min-len = "2" 
-	data-selected = '{ "txt": "Все товары", "val": "-1" }' 
-	data-const-list = '[{ "txt": "Все товары", 	"val": "-1" },{ "txt": "Все заказчики", "val": "-2" }]'
-	data-not-found-list = '[{ "txt": "Ничего не найдено" },{ "txt": "Попробуйте ещё раз!" }]' >
-    <input type = "hidden" class = "search-token" value = "83kdsmkwej3" name = "_token">
-    <input type = "search" class = "search-pole" name="search_val" value = "">
-    <input type = "hidden" class = "result-selected" value = "" name = "search_select_result">
-    <ul name = "result_list"></ul>
+<div id="search-select-demo"
+     data-handler="search-select-demo.php"
+     data-search-min-len="2"
+     data-selected='{ "txt": "Все товары", "val": "-1" }'
+     data-const-list='[{ "txt": "Все товары", 	"val": "-1" },{ "txt": "Все заказчики", "val": "-2" }]'
+     data-not-found-list='[{ "txt": "Ничего не найдено" },{ "txt": "Попробуйте ещё раз!" }]'>
+    <input type="hidden" class="search-token" value="83kdsmkwej3" name="_token">
+    <input type="search" class="search-pole" name="search_val" value="">
+    <input type="hidden" class="result-selected" value="" name="search_select_result">
+    <ul name="result_list"></ul>
 </div>
 
 <script src="search-select-demo.js"></script>
