@@ -12,17 +12,12 @@ var SearchSelect = function (data) {
 
 /**
  * @param {{
- * 		SearchSelect: SearchSelect,
  * 		handleEvent: Function,
- * 		isXHR: Boolean|mixed
+ * 		isXHR: Boolean|undefined
  * 	}} data
  * @constructor
  */
 SearchSelect.Event = function (data) {
-	if (! (data.SearchSelect instanceof SearchSelect)) {
-		throw "SearchSelect.Event: data.SearchSelect is not object of class SearchSelect!";
-	}
-	this.SearchSelect = data.SearchSelect;
 	if (! Types.isFunction(data.handleEvent)) {
 		throw "SearchSelect.Event: data.handleEvent is not type of Function!";
 	}
@@ -73,6 +68,7 @@ SearchSelect.ResItem = function (props, isGet = false) {
 		this.create();
 	}
 };
+
 
 /**
  * @type {{const: string, dyn: string}}
@@ -621,27 +617,22 @@ SearchSelect.prototype = {
 			let __this = this;
 
 			_this.getters.searchEl().on('click', new SearchSelect.Event({
-				SearchSelect: _this,
 				handleEvent: __this.searchClick,
 				isXHR: true
 			})).
 			on("input", new SearchSelect.Event({
-				SearchSelect: _this,
 				handleEvent: __this.searchInput,
 				isXHR: true
 			}));
 
 			DOMElements.make("html").on("mouseup", new SearchSelect.Event({
-				SearchSelect: _this,
 				handleEvent: __this.htmlMouseUp
 			}), true).
 			on("keyup", new SearchSelect.Event({
-				SearchSelect: _this,
 				handleEvent: __this.htmlKeyUp
 			}));
 
 			_this.getters.resListEl().on("click", new SearchSelect.Event({
-				SearchSelect: _this,
 				handleEvent: __this.resListClick
 			}));
 		};
