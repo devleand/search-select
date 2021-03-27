@@ -1,45 +1,3 @@
-/**
- * @param {{
- * 		SearchSelect: SearchSelect,
- * 		handleEvent: Function,
- * 		isXHR: Boolean|mixed
- * 	}} data
- * @constructor
- */
-var SearchSelectEvent = function (data) {
-	if (! (data.SearchSelect instanceof SearchSelect)) {
-		throw "SearchSelectEvent: data.SearchSelect is not object of class SearchSelect!";
-	}
-	this.SearchSelect = data.SearchSelect;
-	if (! Types.isFunction(data.handleEvent)) {
-		throw "SearchSelectEvent: data.handleEvent is not type of Function!";
-	}
-	this._handleEvent = data.handleEvent;
-	if (Types.isBool(data.isXHR)) {
-		this.isXHR = data.isXHR;
-	}
-};
-SearchSelectEvent.prototype = {
-	/**
-	 * @type {Boolean}
-	 */
-	isXHR: false,
-
-	/**
-	 * @type {Object}
-	 */
-	XHR: {
-		abort: function () {}
-	},
-
-	handleEvent: function (e) {
-		if (this.isXHR) {
-			this.XHR.abort();
-		}
-		this._handleEvent(e);
-	}
-};
-
 var SearchSelect = function (data) {
 	this.init();
 
@@ -51,6 +9,79 @@ var SearchSelect = function (data) {
 
 	this.e.set();
 };
+
+/**
+ * @param {{
+ * 		SearchSelect: SearchSelect,
+ * 		handleEvent: Function,
+ * 		isXHR: Boolean|mixed
+ * 	}} data
+ * @constructor
+ */
+SearchSelect.Event = function (data) {
+	if (! (data.SearchSelect instanceof SearchSelect)) {
+		throw "SearchSelect.Event: data.SearchSelect is not object of class SearchSelect!";
+	}
+	this.SearchSelect = data.SearchSelect;
+	if (! Types.isFunction(data.handleEvent)) {
+		throw "SearchSelect.Event: data.handleEvent is not type of Function!";
+	}
+	this._handleEvent = data.handleEvent;
+	if (Types.isBool(data.isXHR)) {
+		this.isXHR = data.isXHR;
+	}
+};
+
+/**
+ * @param {
+ * 		{el: string | DOMElements | NodeList | Element}
+ * 		| {class: string|mixed, val: string|mixed, type: string|mixed, isResult: Boolean|mixed, txt: string|mixed}
+ * 		} props
+ * @param {Boolean} isGet
+ * @constructor
+ */
+SearchSelect.ResItem = function (props, isGet = false) {
+	this.init();
+
+	if (isGet) {
+		let li_el = new DOMElements(props.el);
+
+		this.setters.virtual.class(li_el.attr(this.attrs.class));
+		this.setters.virtual.val(li_el.attr(this.attrs.val));
+		this.setters.virtual.type(li_el.attr(this.attrs.type));
+		this.setters.virtual.isResult(li_el.attr(this.attrs.isResult));
+		this.setters.virtual.txt(li_el.txt());
+
+		this.set(li_el);
+	} else {
+		if (!!props.class) {
+			this.setters.virtual.class(props.class);
+		}
+		if (!!props.val) {
+			this.setters.virtual.val(props.val);
+		}
+		if (!!props.type) {
+			this.setters.virtual.type(props.type);
+		}
+		if (Types.isBool(props.isResult)) {
+			this.setters.virtual.isResult(props.isResult);
+		}
+		if (!!props.txt) {
+			this.setters.virtual.txt(props.txt);
+		}
+
+		this.create();
+	}
+};
+
+/**
+ * @type {{const: string, dyn: string}}
+ */
+SearchSelect.ResItem.Types = {
+	dyn: "dyn",
+	const: "const"
+};
+
 
 SearchSelect.prototype = {
 	/**
@@ -387,7 +418,7 @@ SearchSelect.prototype = {
 
 			let const_list = _this.constList;
 			for (let i = 0; i < const_list.length; i++) {
-				const_list[i].type = ResItemTypes.const;
+				const_list[i].type = SearchSelect.ResItem.Types.const;
 			}
 			_this.resList.set(const_list);
 		};
@@ -589,27 +620,27 @@ SearchSelect.prototype = {
 			let _this = this.parent;
 			let __this = this;
 
-			_this.getters.searchEl().on('click', new SearchSelectEvent({
+			_this.getters.searchEl().on('click', new SearchSelect.Event({
 				SearchSelect: _this,
 				handleEvent: __this.searchClick,
 				isXHR: true
 			})).
-			on("input", new SearchSelectEvent({
+			on("input", new SearchSelect.Event({
 				SearchSelect: _this,
 				handleEvent: __this.searchInput,
 				isXHR: true
 			}));
 
-			DOMElements.make("html").on("mouseup", new SearchSelectEvent({
+			DOMElements.make("html").on("mouseup", new SearchSelect.Event({
 				SearchSelect: _this,
 				handleEvent: __this.htmlMouseUp
 			}), true).
-			on("keyup", new SearchSelectEvent({
+			on("keyup", new SearchSelect.Event({
 				SearchSelect: _this,
 				handleEvent: __this.htmlKeyUp
 			}));
 
-			_this.getters.resListEl().on("click", new SearchSelectEvent({
+			_this.getters.resListEl().on("click", new SearchSelect.Event({
 				SearchSelect: _this,
 				handleEvent: __this.resListClick
 			}));
@@ -663,7 +694,7 @@ SearchSelect.prototype = {
 			_this.resList.hide();
 		};
 		this.resListClick	= function (e) {
-			let cur_li = new ResItem({
+			let cur_li = new SearchSelect.ResItem({
 				el: e.target
 			}, true);
 			if (cur_li.getters.isResult()) {
@@ -688,7 +719,7 @@ SearchSelect.prototype = {
 			return false;
 		};
 		/**
-		 * @param {ResItem|{val: string, txt: string}} data
+		 * @param {SearchSelect.ResItem|{val: string, txt: string}} data
 		 */
 		this.set 		= function (data) {
 			if (!Types.isObject(data)) {
@@ -698,7 +729,7 @@ SearchSelect.prototype = {
 
 			let val;
 			let txt;
-			if (data instanceof ResItem) {
+			if (data instanceof SearchSelect.ResItem) {
 				val = data.getters.val();
 				txt = data.getters.txt();
 			} else {
@@ -747,14 +778,14 @@ SearchSelect.prototype = {
 			let _this = this.parent;
 
 			for (let i = 0; i < resList.length; i++) {
-				let new_li = new ResItem(resList[i]);
+				let new_li = new SearchSelect.ResItem(resList[i]);
 				_this.getters.resListEl().appendChild(new_li.get().get(0));
 			}
 		};
 		this.reset 	= function () {
 			this.parent.getters.listEl().forEach(function (el) {
-				let res_li = new ResItem({ el: el }, true);
-				if (res_li.getters.type() !== ResItemTypes.const) {
+				let res_li = new SearchSelect.ResItem({ el: el }, true);
+				if (res_li.getters.type() !== SearchSelect.ResItem.Types.const) {
 					res_li.remove();
 				}
 			});
@@ -788,55 +819,28 @@ SearchSelect.prototype = {
 	}
 };
 
-/**
- * @type {{const: string, dyn: string}}
- */
-var ResItemTypes = {
-	dyn: "dyn",
-	const: "const"
-};
-/**
- * @param {
- * 		{el: string | DOMElements | NodeList | Element}
- * 		| {class: string|mixed, val: string|mixed, type: string|mixed, isResult: Boolean|mixed, txt: string|mixed}
- * 		} props
- * @param {Boolean} isGet
- * @constructor
- */
-var ResItem = function (props, isGet = false) {
-	this.init();
+SearchSelect.Event.prototype = {
+	/**
+	 * @type {Boolean}
+	 */
+	isXHR: false,
 
-	if (isGet) {
-		let li_el = new DOMElements(props.el);
+	/**
+	 * @type {Object}
+	 */
+	XHR: {
+		abort: function () {}
+	},
 
-		this.setters.virtual.class(li_el.attr(this.attrs.class));
-		this.setters.virtual.val(li_el.attr(this.attrs.val));
-		this.setters.virtual.type(li_el.attr(this.attrs.type));
-		this.setters.virtual.isResult(li_el.attr(this.attrs.isResult));
-		this.setters.virtual.txt(li_el.txt());
-
-		this.set(li_el);
-	} else {
-		if (!!props.class) {
-			this.setters.virtual.class(props.class);
+	handleEvent: function (e) {
+		if (this.isXHR) {
+			this.XHR.abort();
 		}
-		if (!!props.val) {
-			this.setters.virtual.val(props.val);
-		}
-		if (!!props.type) {
-			this.setters.virtual.type(props.type);
-		}
-		if (Types.isBool(props.isResult)) {
-			this.setters.virtual.isResult(props.isResult);
-		}
-		if (!!props.txt) {
-			this.setters.virtual.txt(props.txt);
-		}
-
-		this.create();
+		this._handleEvent(e);
 	}
 };
-ResItem.prototype = {
+
+SearchSelect.ResItem.prototype = {
 	/**
 	 * @type {DOMElements}
 	 */
@@ -857,7 +861,7 @@ ResItem.prototype = {
 	/**
 	 * @type {String}
 	 */
-	type: ResItemTypes.dyn,
+	type: SearchSelect.ResItem.Types.dyn,
 	/**
 	 * @type {Boolean}
 	 */
@@ -916,7 +920,7 @@ ResItem.prototype = {
 
 		/**
 		 * @private
-		 * @param {ResItem.setters} __this
+		 * @param {SearchSelect.ResItem.setters} __this
 		 */
 		this.virtual 	= function (__this) {
 			this.parent = __this;
@@ -937,7 +941,7 @@ ResItem.prototype = {
 				} else if (Types.isString(isResult)) {
 					_this.isResult = Types.toNumber(isResult) > 0 ? true : false;
 				} else {
-					throw "ResItem: isResult is undefined type!";
+					throw "SearchSelect.ResItem: isResult is undefined type!";
 				}
 			};
 			this.txt 		= function (txt) {
@@ -947,7 +951,7 @@ ResItem.prototype = {
 
 		/**
 		 * @private
-		 * @param {ResItem.setters} __this
+		 * @param {SearchSelect.ResItem.setters} __this
 		 */
 		this.document 	= function (__this) {
 			this.parent = __this;
