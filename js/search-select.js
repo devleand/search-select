@@ -462,29 +462,20 @@ SearchSelect.prototype = {
 		};
 
 		/**
-		 * @param {string|DOMElements} el
-		 * @return {string}
+		 * @param {string} selector
+		 * @return {DOMElements}
 		 */
-		this.selector = function (el) {
-			if (el instanceof DOMElements) return el.selector ?? "";
-			else if (Types.isString(el)) return el;
-			else throw "undefined type of parameter el";
+		this.getElAsDependent = function (selector) {
+			return this.el().children(selector);
 		};
-		/**
-		 * @param {string} el
-		 * @return {string}
-		 */
-		this.dependentSelector = function (el) {
-			return this.selector(this.el()) + " " + this.selector(el);
-		};
-
 		/**
 		 * @param {string} el
 		 * @param {boolean} isDependent
 		 * @return {DOMElements}
 		 */
 		this.getEl = function (el, isDependent = true) {
-			return new DOMElements(isDependent ? this.dependentSelector(_this.els[el]) : _this.els[el]);
+			let selector = _this.els[el];
+			return isDependent ? this.getElAsDependent(selector) : new DOMElements(selector);
 		};
 		/**
 		 * @return {DOMElements}
